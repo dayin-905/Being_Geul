@@ -160,7 +160,7 @@ erDiagram
     }
 ```
 
-##🛠️ Tech Stack
+## 🛠️ Tech Stack
 ### Frontend
 ### Backend & Data
 ### AI & Tools
