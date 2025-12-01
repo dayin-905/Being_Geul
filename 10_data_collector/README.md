@@ -126,7 +126,7 @@ graph TD
 ```
 
 ## 💾 Database Schema
-```mermaide
+```mermaid
 erDiagram
     USERS ||--o{ USER_POLICIES : "saves (likes)"
     POLICIES ||--o{ USER_POLICIES : "is_saved_by"
