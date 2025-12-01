@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Matcher - Project Specification (v1.1)</title>
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --text-color: #1F2937;
+            --bg-color: #F9FAFB;
+            --border-color: #E5E7EB;
+            --header-bg: #FFFFFF;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #111827;
+        }
+        h1 { border-bottom: 2px solid var(--text-color); padding-bottom: 15px; margin-bottom: 30px; }
+        h2 { margin-top: 40px; border-left: 5px solid var(--primary-color); padding-left: 15px; }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            background-color: #EEF2FF;
+            color: #4F46E5;
+            margin-right: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #F3F4F6;
+            font-weight: 600;
+            width: 15%;
+        }
+        .tech-note {
+            background-color: #FFFBEB;
+            border: 1px solid #FCD34D;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #92400E;
+        }
+        .footer-info {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.85em;
+            color: #6B7280;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Project Specification: Policy Matcher</h1>
+        <p><strong>Team:</strong> 빙글 (Being_geul) | <strong>Version:</strong> 1.1 (Final) | <strong>Phase:</strong> 1 (Planning)</p>
+        <p>
+            <span class="badge">React</span>
+            <span class="badge">GSAP</span>
+            <span class="badge">Vite</span>
+            <span class="badge">One-Page Scroll</span>
+        </p>
+    </header>
+
+    <section>
+        <h2>1. 프로젝트 개요 (Overview)</h2>
+        <p><strong>핵심 컨셉:</strong> "모든 것은 돌고 돌아 텍스트에서 시작한다." 텍스트 기반의 역동적인 애니메이션과 직관적인 인터랙션을 통해 청년 정책을 추천하는 웹 서비스.</p>
+        <ul>
+            <li><strong>플랫폼:</strong> 모바일 반응형 웹 (Mobile Responsive Web)</li>
+            <li><strong>구조:</strong> 단일 페이지 스크롤 (One-Page Scroll) + 모달(Modal)</li>
+            <li><strong>개발 방법론:</strong> Waterfall (기획 승인 후 디자인/개발 착수 원칙 준수)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2. 사이트 구조 (Sitemap)</h2>
+        <p>물리적인 페이지 이동 없이, 스크롤을 통해 각 섹션으로 이동합니다.</p>
+        <ol>
+            <li><strong>[Intro]</strong> 로딩 시퀀스 (오프닝 애니메이션)</li>
+            <li><strong>[Section 1]</strong> 정책 매칭 (메인 / 스와이프 UI)</li>
+            <li><strong>[Section 2]</strong> 취향 분석 (Floating 버블 차트)</li>
+            <li><strong>[Section 3]</strong> 나의 보관함 (Masonry 그리드)</li>
+            <li><strong>[Section 4]</strong> 정책 탐색 (검색 및 필터)</li>
+            <li><strong>[Footer]</strong> 서비스 정보 (하단 고정)</li>
+            <li><strong>[Global]</strong> 상세 정보 모달 (Overlay Popup)</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>3. 상세 기능 명세서 (Functional Specs)</h2>
+
+        <h3>3-0. Intro: 다이내믹 로딩 (INTRO-00)</h3>
+        <table>
+            <tr>
+                <th>기획 의도</th>
+                <td>"텍스트들이 제자리를 찾아간다"는 팀 아이덴티티 표현 및 시각적 재미(Fun) 전달.</td>
+            </tr>
+            <tr>
+                <th>시나리오</th>
+                <td>
+                    1. <strong>Chaos:</strong> 정책 키워드들(#주거, #100만원 등)이 화면에서 무질서하게 회전/부유.<br>
+                    2. <strong>Order:</strong> "빙글!" 느낌과 함께 중앙으로 빨려 들어가며 로고로 변신(Morphing).<br>
+                    3. <strong>Welcome:</strong> "당신을 위한 정책을 찾았어요!" 문구 출력 후 섹션 1 등장.
+                </td>
+            </tr>
+            <tr>
+                <th>Tech Spec</th>
+                <td>
+                    - <strong>GSAP Timeline:</strong> 순차적 애니메이션 제어.<br>
+                    - <strong>SessionStorage:</strong> 재방문 시 애니메이션 생략 여부 체크.<br>
+                    - <strong>Pre-loading:</strong> 애니메이션 재생 중 백그라운드에서 API 데이터 호출.
+                </td>
+            </tr>
+        </table>
+
+        <h3>3-1. Section 1: 정책 매칭 (MAIN-01)</h3>
+        <table>
+            <tr>
+                <th>UI 구성</th>
+                <td>화면 중앙 카드 덱(Card Deck). 텍스트 위주(제목, 핵심요약, D-Day) 디자인.</td>
+            </tr>
+            <tr>
+                <th>스와이프 로직</th>
+                <td>
+                    - <strong>왼쪽 드래그:</strong> 좋아요 (Like) → 저장 및 분석 반영.<br>
+                    - <strong>오른쪽 드래그:</strong> 패스 (Pass) → 다음 카드.<br>
+                    * 카드 소진 시 Section 4(탐색) 이동 버튼 노출.
+                </td>
+            </tr>
+            <tr>
+                <th>클릭 인터랙션</th>
+                <td>카드 덱 최상단 클릭 시 <strong>[상세 정보 모달]</strong> 호출.</td>
+            </tr>
+            <tr>
+                <th>Tech Note</th>
+                <td>
+                    <div class="tech-note">
+                        <strong>Event Conflict:</strong> 드래그와 클릭을 구분하기 위해 이동 거리가 5px 미만일 때만 'Click'으로 간주하는 Threshold 로직 필수 구현.
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <h3>3-2. Section 2: 취향 분석 (ANAL-01)</h3>
+        <table>
+            <tr>
+                <th>기능 정의</th>
+                <td>사용자가 '좋아요'한 정책의 태그 비중(%)을 시각화.</td>
+            </tr>
+            <tr>
+                <th>UI/Interaction</th>
+                <td>
+                    - <strong>Floating Bubbles:</strong> 키워드 버블이 둥둥 떠다니는 무중력 효과.<br>
+                    - 선호도가 높을수록 버블 크기가 크고 움직임이 묵직함.<br>
+                    - 마우스 오버 시 일시 정지 또는 확대.
+                </td>
+            </tr>
+        </table>
+
+        <h3>3-3. Section 3: 나의 보관함 (SAVE-01)</h3>
+        <table>
+            <tr>
+                <th>UI 구성</th>
+                <td>높이가 다른 카드들이 벽돌처럼 쌓이는 <strong>Masonry Layout</strong> (핀터레스트 스타일).</td>
+            </tr>
+            <tr>
+                <th>기능</th>
+                <td>
+                    - 카드 클릭 시 상세 모달 호출.<br>
+                    - '하트' 아이콘 클릭 시 삭제 (삭제 후 'Undo' 토스트 팝업 제공).
+                </td>
+            </tr>
+        </table>
+
+        <h3>3-4. Section 4: 정책 탐색 (EXPL-01)</h3>
+        <table>
+            <tr>
+                <th>검색/필터</th>
+                <td>
+                    - 상단 검색바 (실시간/엔터).<br>
+                    - 가로 스크롤(Horizontal Scroll) 가능한 카테고리 태그 필터.
+                </td>
+            </tr>
+            <tr>
+                <th>리스트</th>
+                <td>전체 DB 조회. 저장되지 않은 항목은 빈 하트로 표시.</td>
+            </tr>
+        </table>
+
+        <h3>3-5. Footer (FOOTER-01)</h3>
+        <table>
+            <tr>
+                <th>위치/구성</th>
+                <td>
+                    - 최하단 고정 (Static Component).<br>
+                    - <strong>Contents:</strong> 팀 로고(빙글), 슬로건, 저작권 표기(© 2025), 팀 소개/문의 링크.
+                </td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>4. 공통 모듈 (Global Modules)</h2>
+        
+        <h3>상세 정보 모달 (MODAL-01)</h3>
+        <table>
+            <tr>
+                <th>형태</th>
+                <td>배경 Dim 처리된 오버레이 팝업 (페이지 이동 없음).</td>
+            </tr>
+            <tr>
+                <th>콘텐츠</th>
+                <td>
+                    - 헤더: 정책 제목, 태그 (#주거 등).<br>
+                    - 바디: 핵심 요약(2~3줄), 상세 본문, 지원 자격.<br>
+                    - 기간: 신청 및 운영 기간 (YYYY.MM.DD).
+                </td>
+            </tr>
+            <tr>
+                <th>주요 액션</th>
+                <td>
+                    1. <strong>사이트 바로가기:</strong> 클릭 시 공식 웹사이트로 이동 <strong>(새 탭 열기 `target="_blank"` 필수)</strong>.<br>
+                    2. <strong>저장 버튼:</strong> 모달 내부에서 좋아요/취소 가능.
+                </td>
+            </tr>
+        </table>
+
+        <h3>스크롤 내비게이션 (GNB)</h3>
+        <table>
+            <tr>
+                <th>기능</th>
+                <td>우측/상단 고정. 각 섹션으로 Smooth Scroll 이동 및 현재 위치 표시(Scroll Spy).</td>
+            </tr>
+        </table>
+    </section>
+
+    <div class="footer-info">
+        <p>Document Generated by Project Lead AI | Date: 2025.12.01</p>
+    </div>
+</div>
+
+</body>
+</html>
