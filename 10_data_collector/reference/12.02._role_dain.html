@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Policy Matcher - Functional Specification v4.6</title>
+    <title>Policy Matcher - Functional Specification v5.0 (Final)</title>
     <style>
         :root {
             --bg-color: #F3F4F6;
@@ -11,9 +11,10 @@
             --primary: #4338CA; /* Indigo */
             --secondary: #EC4899; /* Pink */
             --text-main: #1F2937;
-            --text-sub: #6B7280;
+            --text-sub: #4B5563;
             --border: #E5E7EB;
-            --nav-active: #4338CA;
+            --highlight-bg: #EEF2FF;
+            --highlight-border: #4338CA;
         }
         body {
             font-family: 'Pretendard', -apple-system, sans-serif;
@@ -31,7 +32,8 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-        /* Header & Title */
+
+        /* Header Area */
         .doc-header {
             border-bottom: 2px solid var(--border);
             padding-bottom: 20px;
@@ -42,7 +44,7 @@
         }
         h1 { margin: 0; font-size: 28px; color: #111; letter-spacing: -0.5px; }
         .version-badge {
-            background: #2563EB; /* Blue for Nav Update */
+            background: #111;
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -52,7 +54,7 @@
             margin-left: 10px;
         }
 
-        /* Architecture Map */
+        /* Architecture Visual Map */
         .arch-map {
             display: flex;
             gap: 10px;
@@ -62,19 +64,21 @@
             border-radius: 12px;
             border: 1px solid var(--border);
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .arch-step {
-            flex: 1;
-            text-align: center;
             background: white;
             border: 1px solid #ddd;
-            padding: 15px 10px;
+            padding: 12px 15px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
+            text-align: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-width: 100px;
         }
-        .arch-step.active { border-color: var(--primary); color: var(--primary); font-weight: bold; }
-        .arch-arrow { color: #ccc; font-size: 18px; }
+        .arch-step.core { border-color: var(--primary); color: var(--primary); font-weight: bold; }
+        .arch-arrow { color: #ccc; font-size: 16px; }
 
         /* Headings */
         h2 {
@@ -84,42 +88,50 @@
             align-items: center;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
+            color: #111;
         }
         .step-num {
             background: #333; color: white; width: 28px; height: 28px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 14px; margin-right: 10px;
         }
-        h3 { color: var(--text-main); font-size: 18px; margin-top: 30px; border-left: 4px solid var(--secondary); padding-left: 12px; }
-        
+        h3 { 
+            color: var(--text-main); font-size: 18px; margin-top: 30px; 
+            border-left: 4px solid var(--secondary); padding-left: 12px; 
+            background: #FFF5F7; padding-top: 5px; padding-bottom: 5px;
+        }
+
         /* Tables */
         table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
         th, td { border: 1px solid var(--border); padding: 14px; text-align: left; }
-        th { background-color: #F3F4F6; width: 20%; color: #374151; font-weight: 600; }
+        th { background-color: #F8FAFC; width: 22%; color: #374151; font-weight: 700; }
         
         /* Badges */
         .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 4px; }
         .b-fe { background: #DEF7EC; color: #03543F; border: 1px solid #84E1BC; } 
         .b-be { background: #E1EFFE; color: #1E429F; border: 1px solid #76A9FA; } 
-        
-        /* Updates Highlight */
+        .b-ux { background: #FDF2F8; color: #99154B; border: 1px solid #FBCFE8; } 
+
+        /* Highlight Box */
         .highlight-box {
-            background-color: #EFF6FF;
-            border-left: 4px solid #2563EB;
+            background-color: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
             padding: 15px;
             margin: 20px 0;
             font-size: 14px;
+            line-height: 1.6;
         }
 
         /* Tech Notes */
         .tech-note {
-            margin-top: 40px;
+            margin-top: 50px;
             background: #FFFBEB;
             border: 1px solid #FCD34D;
             padding: 20px;
             border-radius: 8px;
             font-size: 14px;
         }
+        .tech-note h4 { margin-top: 0; color: #92400E; display: flex; align-items: center; }
 
         .footer-info { margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; font-size: 13px; color: #888; }
     </style>
@@ -129,173 +141,229 @@
 <div class="container">
     <div class="doc-header">
         <div>
-            <h1>Policy Matcher 기능 명세서 <span class="version-badge">v4.6 (Nav Added)</span></h1>
-            <p>Tab Navigation 기반 Single Page Application</p>
+            <h1>Policy Matcher 기능 명세서 <span class="version-badge">v5.0 (Final)</span></h1>
+            <p>One-Page SPA 기반 정책 추천 플랫폼 (Team Binggle)</p>
         </div>
         <div style="text-align: right; font-size: 13px; color: #666;">
             <strong>작성일:</strong> 2025.12.02<br>
-            <strong>상태:</strong> 스크롤 스파이 기능 추가
+            <strong>상태:</strong> 최종 통합본 (기획/기술/데이터)<br>
+            <strong>목표일:</strong> 2026.01.16
         </div>
     </div>
 
     <div class="arch-map">
-        <div class="arch-step active">Global Header<br>(Fixed Top)</div>
-        <div class="arch-arrow">⬇</div>
-        <div class="arch-step">Tab 1 (Main)</div>
-        <div class="arch-arrow">↔</div>
-        <div class="arch-step">Tab 2 (My Page)</div>
-        <div class="arch-arrow">↔</div>
-        <div class="arch-step">Tab 3 (About Us)</div>
+        <div class="arch-step core"><strong>Structure</strong><br>SPA (React)</div>
         <div class="arch-arrow">➕</div>
-        <div class="arch-step" style="border-color: #2563EB; color: #2563EB;"><strong>Side Nav</strong><br>(Scroll Spy)</div>
+        <div class="arch-step"><strong>Header</strong><br>3-Tab Nav</div>
+        <div class="arch-arrow">➕</div>
+        <div class="arch-step"><strong>Side Nav</strong><br>Scroll Spy</div>
+        <div class="arch-arrow">➡</div>
+        <div class="arch-step"><strong>Tab 1</strong><br>Main</div>
+        <div class="arch-step"><strong>Tab 2</strong><br>My Page</div>
+        <div class="arch-step"><strong>Tab 3</strong><br>About Us</div>
     </div>
 
     <div class="highlight-box">
-        <strong>💡 신규 추가 (New Feature):</strong><br>
-        우측 <strong>[스크롤 스파이 네비게이션]</strong>이 추가되었습니다. 긴 페이지 내에서 현재 보고 있는 섹션을 실시간으로 표시하고, 클릭 시 해당 위치로 부드럽게 이동합니다.
+        <strong>💡 프로젝트 핵심 컨셉 (Core Concept):</strong><br>
+        본 프로젝트는 <strong>"2030 청년 및 초기 창업자"</strong>를 위해 기업마당의 방대한 정책 데이터를 <strong>N8N/Python으로 정제</strong>하고, <strong>One-Page Scroll 방식의 웹사이트</strong>에서 틴더(Tinder) 스타일 UI로 쉽고 직관적으로 추천해 주는 서비스입니다.
     </div>
 
-    <h2><span class="step-num">1</span> Global Navigation Bar (Header)</h2>
-    <p style="font-size: 14px; color: #666;">모든 화면 상단에 고정되어 노출되는 네비게이션 영역입니다.</p>
+    <h2><span class="step-num">1</span> 개발 방향성 및 기술 스택 (Tech Stack)</h2>
     <table>
         <tr>
             <th>구분</th>
-            <th>상세 내용 및 UI Spec</th>
-            <th>Interaction</th>
+            <th>상세 내용 및 결정 사항</th>
+            <th>전략 포인트 (Key Strategy)</th>
         </tr>
         <tr>
-            <td><strong>Layout</strong></td>
+            <td><strong>Frontend</strong></td>
             <td>
-                - <strong>Type:</strong> Fixed Top (Sticky)<br>
-                - <strong>Left:</strong> 서비스 로고 + 홈페이지 이름 (Policy Matcher)<br>
-                - <strong>Right:</strong> 3단 메뉴 탭 (가로 배열)
+                <span class="badge b-fe">Stack</span> <strong>React (Vite)</strong> / Tailwind CSS / GSAP / Lottie<br>
+                <span class="badge b-fe">Workflow</span> Figma Dev Mode HTML 추출 → React 컴포넌트화
             </td>
             <td>
-                <code>position: fixed; top: 0;</code><br>
-                <code>display: flex; justify-content: space-between;</code>
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Menu Tabs</strong></td>
-            <td>
-                1. <strong>MAIN</strong> (정책 탐색)<br>
-                2. <strong>MY PAGE</strong> (취향 분석)<br>
-                3. <strong>ABOUT US</strong> (팀 소개)
-            </td>
-            <td>
-                - 클릭 시 해당 섹션으로 부드럽게 이동 (SPA Routing)<br>
-                - <strong>Active State:</strong> 현재 탭 하이라이트
-            </td>
-        </tr>
-    </table>
-
-    <h2><span class="step-num">2</span> Right Floating Navigation (Scroll Spy)</h2>
-    <p style="font-size: 14px; color: #666;">페이지 우측에 고정되어 현재 섹션 위치를 알려주는 보조 네비게이션입니다.</p>
-    <table>
-        <tr>
-            <th>구성 요소</th>
-            <th>기능 상세 설명</th>
-            <th>구현 로직</th>
-        </tr>
-        <tr>
-            <td><strong>Layout</strong></td>
-            <td>
-                - <strong>Type:</strong> Fixed Right (Vertical)<br>
-                - <strong>Items:</strong> 현재 탭 내의 하위 섹션 리스트 (예: Intro, Swipe, Footer 등)<br>
-                - <strong>Style:</strong> 심플한 텍스트 혹은 불렛(Bullet) 형태 (이미지 예시 참조)
-            </td>
-            <td>
-                <code>position: fixed; right: 2rem; top: 50%;</code><br>
-                <code>transform: translateY(-50%);</code>
+                *<strong>네이밍 규칙(ID=Class)</strong>: AI 프롬프트 학습을 통해 팀원 간 코드 컨벤션 통일.
             </td>
         </tr>
         <tr>
-            <td><strong>Interaction</strong></td>
+            <td><strong>Data Pipeline</strong></td>
             <td>
-                - <strong>Scroll Detection:</strong> 스크롤 시 현재 화면에 보이는 섹션의 메뉴 활성화 (Active Class)<br>
-                - <strong>Click Action:</strong> 클릭 시 해당 섹션으로 부드러운 스크롤 이동
+                <span class="badge b-be">ETL</span> <strong>N8N + Python 자동화</strong><br>
+                - Source: 기업마당 API (+청년정책)<br>
+                - Filter: 단순 홍보 기사 제외, 순수 정책 데이터 분류 완료<br>
+                - Storage: Supabase DB 적재
             </td>
             <td>
-                Intersection Observer API<br>
-                GSAP <code>ScrollToPlugin</code>
+                *데이터 분류 이슈는 <strong>사전 필터링 로직 구현</strong>으로 해결됨.<br>
+                *방대한 데이터 크롤링 속도 및 정확도 지속 모니터링 필요.
             </td>
         </tr>
     </table>
 
-    <h2><span class="step-num">3</span> Tab 1: MAIN (Intro & Policy Swipe)</h2>
+    <h2><span class="step-num">2</span> 네비게이션 구조 (Navigation)</h2>
     <table>
         <tr>
-            <th>구성 요소</th>
-            <th>기능 상세 설명</th>
-            <th>구현 로직</th>
+            <th>구분</th>
+            <th>기능 상세</th>
+            <th>Interaction Logic</th>
         </tr>
         <tr>
-            <td><strong>Intro</strong></td>
-            <td>서비스 설명 + 일러스트 애니메이션 + '시작하기' 버튼</td>
-            <td>Lottie / GSAP</td>
-        </tr>
-        <tr>
-            <td><strong>Policy Swipe</strong></td>
+            <td><strong>Global Header<br>(GNB)</strong></td>
             <td>
-                - 3:4 비율 카드 덱 (일 10개 제한) + <strong>스크롤 고정(Pin)</strong><br>
-                - 튜토리얼 오버레이 (최초 진입 시)<br>
-                - <strong>Action Btn:</strong> 원문 보기 / 신청하기 / 공유하기 (우측 하단)
+                - <strong>Type:</strong> 상단 고정 (Sticky)<br>
+                - <strong>Left:</strong> 로고 + 서비스명<br>
+                - <strong>Right:</strong> [MAIN] [MY PAGE] [ABOUT US] 3단 탭
             </td>
             <td>
-                Left(Like) / Right(Pass)<br>
-                LocalStorage (비회원 저장)
+                - 클릭 시 페이지 새로고침 없이(SPA) 해당 섹션 활성화.<br>
+                - 현재 위치한 탭 텍스트 <strong>Bold/Color Change</strong>.
             </td>
         </tr>
         <tr>
-            <td><strong>Bottom</strong></td>
-            <td>회원가입/로그인 유도 섹션 + Footer</td>
+            <td><strong>Side Nav<br>(Scroll Spy)</strong></td>
+            <td>
+                - <strong>Type:</strong> 우측 중앙 플로팅<br>
+                - <strong>Func:</strong> 긴 원페이지 내 현재 스크롤 위치 표시
+            </td>
+            <td>
+                - 스크롤 시 자동 활성화 (Intersection Observer).<br>
+                - 클릭 시 부드러운 이동 (ScrollTo).
+            </td>
+        </tr>
+    </table>
+
+    <h2><span class="step-num">3</span> [Tab 1] MAIN: 정책 탐색</h2>
+    <p style="font-size: 13px; color: #666;">사용자 진입 및 핵심 기능이 수행되는 메인 탭입니다.</p>
+    
+    <h3>3-A. Intro & Start</h3>
+    <table>
+        <tr>
+            <td><strong>Service Intro</strong></td>
+            <td>
+                - 서비스 소개 텍스트 + <strong>맞춤형 일러스트 애니메이션</strong><br>
+                - "시작하기" 버튼 클릭 시 아래(Swipe 섹션)로 이동
+            </td>
+        </tr>
+    </table>
+
+    <h3>3-B. Policy Swipe (Core)</h3>
+    <table>
+        <tr>
+            <th>기능명</th>
+            <th>기능 상세</th>
+            <th>구현 스펙</th>
+        </tr>
+        <tr>
+            <td><strong>Card UI</strong></td>
+            <td>
+                - <strong>3:4 비율</strong> (모바일 Full) + 스크롤 핀(Pin)<br>
+                - 이미지 매칭 로딩 시 Lottie 애니메이션 (버퍼링 최소화)<br>
+                - <strong>튜토리얼 오버레이:</strong> 최초 진입 시 마우스/키보드 조작법 안내
+            </td>
+            <td>GSAP ScrollTrigger<br>LocalStorage (Tutorial)</td>
+        </tr>
+        <tr>
+            <td><strong>Action</strong></td>
+            <td>
+                - <strong>Left(👈):</strong> Like (저장) / <strong>Right(👉):</strong> Pass (삭제)<br>
+                - <strong>플로팅 버튼(New):</strong> 우측 하단 [원문 보기] [신청하기] [공유하기]
+            </td>
+            <td>Daily Limit: 10 Cards</td>
+        </tr>
+        <tr>
+            <td><strong>Data Sync</strong></td>
+            <td>
+                - 비회원: LocalStorage에 Like 목록 임시 저장<br>
+                - 로그인 시: DB로 데이터 이관 (Merge)
+            </td>
             <td>Supabase Auth</td>
         </tr>
     </table>
 
-    <h2><span class="step-num">4</span> Tab 2: MY PAGE (Analysis & Archive)</h2>
+    <h3>3-C. Bottom Area</h3>
     <table>
         <tr>
-            <th>구성 요소</th>
-            <th>기능 상세 설명</th>
-        </tr>
-        <tr>
-            <td><strong>Hero Title</strong></td>
-            <td>"당신의 취향은?" 대형 타이포그래피 + 페르소나 일러스트</td>
-        </tr>
-        <tr>
-            <td><strong>Analysis</strong></td>
-            <td>육각형 차트 (6개 카테고리) + 30종 일러스트 매칭 결과</td>
-        </tr>
-        <tr>
-            <td><strong>Archive</strong></td>
-            <td>좋아요한 정책 가로 슬라이드 + 하단 랜덤 추천 리스트</td>
+            <td><strong>Auth & Footer</strong></td>
+            <td>
+                - 회원가입/로그인 유도 섹션 (일러스트 포함)<br>
+                - 하단 푸터 (팀 정보, 약관)
+            </td>
         </tr>
     </table>
 
-    <h2><span class="step-num">5</span> 기술 스택 및 데이터 처리 (Technical)</h2>
+    <h2><span class="step-num">4</span> [Tab 2] MY PAGE: 취향 분석</h2>
+    <p style="font-size: 13px; color: #666;">사용자의 활동 데이터를 기반으로 개인화된 결과를 보여줍니다.</p>
+
     <table>
         <tr>
-            <td><strong>Client</strong></td>
-            <td>
-                <span class="badge b-fe">Workflow</span> Figma Dev Mode 추출 → <strong>React (Vite)</strong><br>
-                <span class="badge b-fe">Rule</span> <strong>AI 학습용 프롬프트</strong>를 통해 'ID=Class' 네이밍 규칙 준수 및 코드 통일성 확보
-            </td>
+            <th>구분</th>
+            <th>기능 상세</th>
+            <th>Data Visualization</th>
         </tr>
         <tr>
-            <td><strong>Data & DB</strong></td>
+            <td><strong>Hero</strong></td>
+            <td><strong>"당신의 취향은?"</strong> 대형 타이포그래피 + 페르소나 일러스트</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td><strong>Analysis</strong></td>
             <td>
-                <span class="badge b-be">ETL</span> N8N + Python으로 기업마당 API 수집 및 <strong>기사/정책 필터링 완료</strong><br>
-                <span class="badge b-be">DB</span> Supabase 적재 (방대한 데이터 처리 정확도 모니터링 필수)
+                - <strong>육각형 차트:</strong> 6개 정책 카테고리 분포 시각화<br>
+                - <strong>페르소나:</strong> 1순위+2순위 조합에 따른 30종 일러스트 매칭
             </td>
+            <td>Chart.js / SVG</td>
+        </tr>
+        <tr>
+            <td><strong>Archive</strong></td>
+            <td>
+                - <strong>저장 목록:</strong> "좋아요한 정책 보러가기" (가로 슬라이드)<br>
+                - <strong>랜덤 추천:</strong> 하단에 전체 DB 중 랜덤 정책 노출
+            </td>
+            <td>Horizontal Scroll</td>
+        </tr>
+    </table>
+
+    <h2><span class="step-num">5</span> [Tab 3] ABOUT US: 팀 소개</h2>
+    <p style="font-size: 13px; color: #666;">신규 추가된 홍보 및 문의 페이지입니다.</p>
+
+    <table>
+        <tr>
+            <th>구분</th>
+            <th>기능 상세</th>
+            <th>구현 스펙</th>
+        </tr>
+        <tr>
+            <td><strong>Brand Film</strong></td>
+            <td>
+                - 서비스 홍보 영상 (클릭 시 재생)<br>
+                - 재생바, 음량 조절 컨트롤러 포함
+            </td>
+            <td><code>&lt;video controls&gt;</code></td>
+        </tr>
+        <tr>
+            <td><strong>Team Intro</strong></td>
+            <td>
+                - <strong>6인 멤버 소개</strong> (Grid Layout)<br>
+                - 각 멤버별 일러스트(Avatar), 닉네임, 역할, 한 줄 소개
+            </td>
+            <td>CSS Grid</td>
+        </tr>
+        <tr>
+            <td><strong>Contact Us</strong></td>
+            <td>
+                - 상세 문의 폼 (이름, 이메일, 연락처, 내용)<br>
+                - "문의하기" 버튼 클릭 시 접수 완료 모달
+            </td>
+            <td>Form Validation<br>DB Insert</td>
         </tr>
     </table>
 
     <div class="tech-note">
-        <h4>⚠️ 개발자 코멘트 (Risk & Concern)</h4>
+        <h4>✅ 최종 검토 사항 (Final Review Note)</h4>
         <ul>
-            <li><strong>Data Concern:</strong> N8N/Python 파이프라인은 구축되었으나, <strong>방대한 데이터 크롤링 속도 및 분류 정확도</strong>에 대한 우려가 있어 지속적인 로직 개선이 필요합니다.</li>
-            <li><strong>SPA Routing:</strong> 상단 탭(GNB)과 우측 스크롤 스파이(Side Nav) 간의 충돌이 없도록, 전역 상태(Zustand) 혹은 라우팅 구조를 명확히 설계해야 합니다.</li>
+            <li><strong>SPA Architecture:</strong> 모든 탭과 섹션은 하나의 페이지 내에서 유기적으로 연결되며, 새로고침 없이 부드럽게 전환되어야 합니다.</li>
+            <li><strong>Data Stability:</strong> 방대한 기업마당 데이터를 N8N으로 1차 정제했으나, 실시간 서비스 시 API 호출량 및 로딩 속도 최적화(Lazy Loading)가 필수적입니다.</li>
+            <li><strong>Schedule:</strong> 디자인 시스템 확정(12/8) 즉시 퍼블리싱 및 기능 구현에 착수하여 1월 16일 런칭 일정을 준수합니다.</li>
         </ul>
     </div>
 
