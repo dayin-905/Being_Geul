@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Policy Matcher - Functional Specification v4.4</title>
+    <title>Policy Matcher - Functional Specification v4.6</title>
     <style>
         :root {
             --bg-color: #F3F4F6;
@@ -13,9 +13,7 @@
             --text-main: #1F2937;
             --text-sub: #6B7280;
             --border: #E5E7EB;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
+            --nav-active: #4338CA;
         }
         body {
             font-family: 'Pretendard', -apple-system, sans-serif;
@@ -33,8 +31,8 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-        /* Header */
-        header {
+        /* Header & Title */
+        .doc-header {
             border-bottom: 2px solid var(--border);
             padding-bottom: 20px;
             margin-bottom: 40px;
@@ -44,7 +42,7 @@
         }
         h1 { margin: 0; font-size: 28px; color: #111; letter-spacing: -0.5px; }
         .version-badge {
-            background: #7C3AED; /* Violet for Major Update */
+            background: #2563EB; /* Blue for Nav Update */
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -53,42 +51,30 @@
             vertical-align: middle;
             margin-left: 10px;
         }
-        
+
         /* Architecture Map */
         .arch-map {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 40px;
             background: #F9FAFB;
             padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border);
+            align-items: center;
         }
         .arch-step {
             flex: 1;
             text-align: center;
-            position: relative;
-        }
-        .arch-step::after {
-            content: '➔';
-            position: absolute;
-            right: -10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #ccc;
-        }
-        .arch-step:last-child::after { content: ''; }
-        .arch-box {
             background: white;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 10px;
+            border: 1px solid #ddd;
+            padding: 15px 10px;
             border-radius: 8px;
-            font-weight: bold;
             font-size: 14px;
-            margin-bottom: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .arch-desc { font-size: 12px; color: var(--text-sub); }
+        .arch-step.active { border-color: var(--primary); color: var(--primary); font-weight: bold; }
+        .arch-arrow { color: #ccc; font-size: 18px; }
 
         /* Headings */
         h2 {
@@ -104,26 +90,25 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 14px; margin-right: 10px;
         }
-
         h3 { color: var(--text-main); font-size: 18px; margin-top: 30px; border-left: 4px solid var(--secondary); padding-left: 12px; }
         
         /* Tables */
-        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
         th, td { border: 1px solid var(--border); padding: 14px; text-align: left; }
-        th { background-color: #F3F4F6; font-weight: 600; width: 20%; color: #374151; }
+        th { background-color: #F3F4F6; width: 20%; color: #374151; font-weight: 600; }
         
         /* Badges */
         .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-right: 4px; }
         .b-fe { background: #DEF7EC; color: #03543F; border: 1px solid #84E1BC; } 
         .b-be { background: #E1EFFE; color: #1E429F; border: 1px solid #76A9FA; } 
-        .b-ux { background: #FDF2F8; color: #99154B; border: 1px solid #FBCFE8; } 
         
-        .status-update {
-            display: block;
-            margin-top: 5px;
-            font-size: 12px;
-            color: var(--danger);
-            font-weight: bold;
+        /* Updates Highlight */
+        .highlight-box {
+            background-color: #EFF6FF;
+            border-left: 4px solid #2563EB;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
         }
 
         /* Tech Notes */
@@ -135,162 +120,77 @@
             border-radius: 8px;
             font-size: 14px;
         }
-        .tech-note h4 { margin-top: 0; color: #92400E; display: flex; align-items: center; }
-        .tech-note h4::before { content: '⚠️'; margin-right: 8px; }
 
-        /* Footer */
-        .footer-info {
-            margin-top: 50px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-            text-align: center;
-            font-size: 13px;
-            color: #888;
-        }
+        .footer-info { margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; font-size: 13px; color: #888; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
+    <div class="doc-header">
         <div>
-            <h1>Policy Matcher 기능 명세서 <span class="version-badge">v4.4 (Full Updated)</span></h1>
-            <p>One-Page Scroll 기반 정책 추천 플랫폼</p>
+            <h1>Policy Matcher 기능 명세서 <span class="version-badge">v4.6 (Nav Added)</span></h1>
+            <p>Tab Navigation 기반 Single Page Application</p>
         </div>
         <div style="text-align: right; font-size: 13px; color: #666;">
             <strong>작성일:</strong> 2025.12.02<br>
-            <strong>작성자:</strong> Team Binggle<br>
-            <strong>상태:</strong> 최종 기획 반영 (원페이지 통합)
-        </div>
-    </header>
-
-    <div class="arch-map">
-        <div class="arch-step">
-            <div class="arch-box">Structure</div>
-            <div class="arch-desc"><strong>One-Page Scroll</strong><br>(No Refresh)</div>
-        </div>
-        <div class="arch-step">
-            <div class="arch-box">Section 1</div>
-            <div class="arch-desc">Intro & Start</div>
-        </div>
-        <div class="arch-step">
-            <div class="arch-box">Section 2</div>
-            <div class="arch-desc">Policy Swipe</div>
-        </div>
-        <div class="arch-step">
-            <div class="arch-box">Section 3</div>
-            <div class="arch-desc">Auth & Footer</div>
-        </div>
-        <div class="arch-step">
-            <div class="arch-box">Section 4</div>
-            <div class="arch-desc">My Page (Analysis)</div>
+            <strong>상태:</strong> 스크롤 스파이 기능 추가
         </div>
     </div>
 
-    <h2><span class="step-num">1</span> 개발 방향성 및 기술 스택</h2>
+    <div class="arch-map">
+        <div class="arch-step active">Global Header<br>(Fixed Top)</div>
+        <div class="arch-arrow">⬇</div>
+        <div class="arch-step">Tab 1 (Main)</div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-step">Tab 2 (My Page)</div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-step">Tab 3 (About Us)</div>
+        <div class="arch-arrow">➕</div>
+        <div class="arch-step" style="border-color: #2563EB; color: #2563EB;"><strong>Side Nav</strong><br>(Scroll Spy)</div>
+    </div>
+
+    <div class="highlight-box">
+        <strong>💡 신규 추가 (New Feature):</strong><br>
+        우측 <strong>[스크롤 스파이 네비게이션]</strong>이 추가되었습니다. 긴 페이지 내에서 현재 보고 있는 섹션을 실시간으로 표시하고, 클릭 시 해당 위치로 부드럽게 이동합니다.
+    </div>
+
+    <h2><span class="step-num">1</span> Global Navigation Bar (Header)</h2>
+    <p style="font-size: 14px; color: #666;">모든 화면 상단에 고정되어 노출되는 네비게이션 영역입니다.</p>
     <table>
         <tr>
             <th>구분</th>
-            <th>상세 내용 및 결정 사항</th>
-            <th>비고 (Risk & Rules)</th>
+            <th>상세 내용 및 UI Spec</th>
+            <th>Interaction</th>
         </tr>
         <tr>
-            <td><strong>Structure</strong></td>
+            <td><strong>Layout</strong></td>
             <td>
-                <span class="badge b-fe">One-Page</span> <strong>단일 페이지 스크롤 아키텍처</strong><br>
-                - 모든 섹션이 하나의 페이지에 존재하며 스크롤/네비게이션으로 이동.<br>
-                - Figma Dev Mode 활용 HTML 추출 → React 전환 예정.
+                - <strong>Type:</strong> Fixed Top (Sticky)<br>
+                - <strong>Left:</strong> 서비스 로고 + 홈페이지 이름 (Policy Matcher)<br>
+                - <strong>Right:</strong> 3단 메뉴 탭 (가로 배열)
             </td>
-            <td style="background-color: #fefce8;">
-                <strong>*네이밍 규칙(ID=Class) 준수:</strong><br>
-                대표 1인이 'AI 학습 프롬프트' 제작 후 전원 공유하여 코드 일관성 유지.
+            <td>
+                <code>position: fixed; top: 0;</code><br>
+                <code>display: flex; justify-content: space-between;</code>
             </td>
         </tr>
         <tr>
-            <td><strong>Data Pipeline</strong></td>
+            <td><strong>Menu Tabs</strong></td>
             <td>
-                <span class="badge b-be">ETL</span> <strong>N8N + Python 데이터 정제</strong><br>
-                - 기업마당 API 수집 및 기사/정책 필터링 자동화.<br>
-                - Supabase DB 적재 후 프론트엔드 서빙.
+                1. <strong>MAIN</strong> (정책 탐색)<br>
+                2. <strong>MY PAGE</strong> (취향 분석)<br>
+                3. <strong>ABOUT US</strong> (팀 소개)
             </td>
             <td>
-                <strong>[Concern]</strong> 방대한 데이터 크롤링 및 분류의 정확도 확보에 대한 우려가 존재함. (지속적 모니터링 필요)
+                - 클릭 시 해당 섹션으로 부드럽게 이동 (SPA Routing)<br>
+                - <strong>Active State:</strong> 현재 탭 하이라이트
             </td>
         </tr>
     </table>
 
-    <h2><span class="step-num">2</span> Section 1: Intro (Landing)</h2>
-    <p style="font-size: 14px; color: #666;">사용자에게 서비스의 목적을 명확히 전달하고 진입을 유도하는 첫 화면입니다.</p>
-
-    <table>
-        <tr>
-            <th>구성 요소</th>
-            <th>기능 상세 설명</th>
-            <th>구현 로직 / UI Spec</th>
-        </tr>
-        <tr>
-            <td><strong>Service Intro</strong><br><span class="badge b-ux">Animation</span></td>
-            <td>
-                - 서비스 핵심 가치를 담은 간략한 설명 텍스트<br>
-                - 컨셉에 맞는 <strong>일러스트 + 애니메이션</strong> (Lottie/GSAP) 적용<br>
-                - "시작하기" 버튼 클릭 시 Section 2로 스크롤 이동
-            </td>
-            <td>
-                GSAP ScrollTrigger<br>
-                <code>scrollTo: '#swipe-section'</code>
-            </td>
-        </tr>
-    </table>
-
-    <h2><span class="step-num">3</span> Section 2: Policy Swipe (Main)</h2>
-    <p style="font-size: 14px; color: #666;">정책을 탐색하고 좋아요/패스를 결정하는 핵심 인터랙션 구간입니다.</p>
-
-    <table>
-        <tr>
-            <th>구성 요소</th>
-            <th>기능 상세 설명</th>
-            <th>구현 로직 / UI Spec</th>
-        </tr>
-        <tr>
-            <td><strong>Card UI</strong></td>
-            <td>
-                - <strong>3:4 비율 (모바일 Full)</strong> + 스크롤 고정(Pinning)<br>
-                - 이미지 매칭 중 로딩 애니메이션 (Lottie)<br>
-                - 튜토리얼 오버레이 (최초 진입 시 조작법 안내)
-            </td>
-            <td>
-                GSAP ScrollTrigger.pin<br>
-                Daily Limit: 10 Cards
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Action Buttons</strong><br><span class="status-update">New!</span></td>
-            <td>
-                카드 우측 하단에 플로팅/고정 버튼 배치:<br>
-                1. <strong>원문 바로보기</strong> (새 탭)<br>
-                2. <strong>바로 신청하기</strong> (링크 연결)<br>
-                3. <strong>공유하기</strong> (링크 복사/카톡)
-            </td>
-            <td>
-                Position: Absolute (Bottom-Right)<br>
-                <code>z-index: 10</code>
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Swipe Logic</strong></td>
-            <td>
-                - Left(👈): Like (저장) / Right(👉): Pass (삭제)<br>
-                - 비회원 데이터 LocalStorage 임시 저장 (가입 시 이관)
-            </td>
-            <td>
-                Keyboard Event Support
-            </td>
-        </tr>
-    </table>
-
-    <h2><span class="step-num">4</span> Section 3: Auth & Footer (Bottom)</h2>
-    <p style="font-size: 14px; color: #666;">Main 페이지의 최하단 영역입니다.</p>
-
+    <h2><span class="step-num">2</span> Right Floating Navigation (Scroll Spy)</h2>
+    <p style="font-size: 14px; color: #666;">페이지 우측에 고정되어 현재 섹션 위치를 알려주는 보조 네비게이션입니다.</p>
     <table>
         <tr>
             <th>구성 요소</th>
@@ -298,70 +198,95 @@
             <th>구현 로직</th>
         </tr>
         <tr>
-            <td><strong>Login / Join</strong></td>
+            <td><strong>Layout</strong></td>
             <td>
-                - 회원가입/로그인 폼과 함께 <strong>관련 일러스트</strong> 배치<br>
-                - "지금 가입하고 내 정책 저장하기" 강조
+                - <strong>Type:</strong> Fixed Right (Vertical)<br>
+                - <strong>Items:</strong> 현재 탭 내의 하위 섹션 리스트 (예: Intro, Swipe, Footer 등)<br>
+                - <strong>Style:</strong> 심플한 텍스트 혹은 불렛(Bullet) 형태 (이미지 예시 참조)
             </td>
             <td>
-                Supabase Auth 연동
+                <code>position: fixed; right: 2rem; top: 50%;</code><br>
+                <code>transform: translateY(-50%);</code>
             </td>
         </tr>
         <tr>
-            <td><strong>Footer</strong></td>
+            <td><strong>Interaction</strong></td>
             <td>
-                - 로그인 섹션 바로 아래 위치<br>
-                - 저작권, 팀 정보, 약관 표시
+                - <strong>Scroll Detection:</strong> 스크롤 시 현재 화면에 보이는 섹션의 메뉴 활성화 (Active Class)<br>
+                - <strong>Click Action:</strong> 클릭 시 해당 섹션으로 부드러운 스크롤 이동
             </td>
             <td>
-                Static Layout
-            </td>
-        </tr>
-    </table>
-
-    <h2><span class="step-num">5</span> Section 4: My Page (Analysis)</h2>
-    <p style="font-size: 14px; color: #666;">별도 메뉴 혹은 스크롤을 통해 진입하는 개인화 분석 공간입니다.</p>
-
-    <h3>5-A. Hero Section</h3>
-    <table>
-        <tr>
-            <td><strong>Hero Title</strong><br><span class="badge b-ux">Typo</span></td>
-            <td>
-                - <strong>"당신의 취향은?"</strong> 대형 타이포그래피<br>
-                - 맞춤형 페르소나 일러스트 배치
-            </td>
-            <td>
-                Font-size: 3rem+<br>
-                Bold Weight
+                Intersection Observer API<br>
+                GSAP <code>ScrollToPlugin</code>
             </td>
         </tr>
     </table>
 
-    <h3>5-B. Analysis & Archive</h3>
+    <h2><span class="step-num">3</span> Tab 1: MAIN (Intro & Policy Swipe)</h2>
     <table>
         <tr>
-            <th>기능명</th>
+            <th>구성 요소</th>
             <th>기능 상세 설명</th>
-            <th>데이터 로직</th>
+            <th>구현 로직</th>
         </tr>
         <tr>
-            <td><strong>분석 차트</strong></td>
+            <td><strong>Intro</strong></td>
+            <td>서비스 설명 + 일러스트 애니메이션 + '시작하기' 버튼</td>
+            <td>Lottie / GSAP</td>
+        </tr>
+        <tr>
+            <td><strong>Policy Swipe</strong></td>
             <td>
-                - 6개 카테고리 육각형 차트 (데이터 < 20개 시 게이지 바)<br>
-                - 1순위+2순위 조합에 따른 30종 일러스트 매칭
+                - 3:4 비율 카드 덱 (일 10개 제한) + <strong>스크롤 고정(Pin)</strong><br>
+                - 튜토리얼 오버레이 (최초 진입 시)<br>
+                - <strong>Action Btn:</strong> 원문 보기 / 신청하기 / 공유하기 (우측 하단)
             </td>
             <td>
-                Chart.js / SVG
+                Left(Like) / Right(Pass)<br>
+                LocalStorage (비회원 저장)
             </td>
         </tr>
         <tr>
-            <td><strong>보관함</strong></td>
+            <td><strong>Bottom</strong></td>
+            <td>회원가입/로그인 유도 섹션 + Footer</td>
+            <td>Supabase Auth</td>
+        </tr>
+    </table>
+
+    <h2><span class="step-num">4</span> Tab 2: MY PAGE (Analysis & Archive)</h2>
+    <table>
+        <tr>
+            <th>구성 요소</th>
+            <th>기능 상세 설명</th>
+        </tr>
+        <tr>
+            <td><strong>Hero Title</strong></td>
+            <td>"당신의 취향은?" 대형 타이포그래피 + 페르소나 일러스트</td>
+        </tr>
+        <tr>
+            <td><strong>Analysis</strong></td>
+            <td>육각형 차트 (6개 카테고리) + 30종 일러스트 매칭 결과</td>
+        </tr>
+        <tr>
+            <td><strong>Archive</strong></td>
+            <td>좋아요한 정책 가로 슬라이드 + 하단 랜덤 추천 리스트</td>
+        </tr>
+    </table>
+
+    <h2><span class="step-num">5</span> 기술 스택 및 데이터 처리 (Technical)</h2>
+    <table>
+        <tr>
+            <td><strong>Client</strong></td>
             <td>
-                - "좋아요한 정책 보러가기" 클릭 시 가로 슬라이드 노출<br>
-                - 하단 랜덤 추천 정책 리스트 (목록형)
+                <span class="badge b-fe">Workflow</span> Figma Dev Mode 추출 → <strong>React (Vite)</strong><br>
+                <span class="badge b-fe">Rule</span> <strong>AI 학습용 프롬프트</strong>를 통해 'ID=Class' 네이밍 규칙 준수 및 코드 통일성 확보
             </td>
+        </tr>
+        <tr>
+            <td><strong>Data & DB</strong></td>
             <td>
-                Horizontal Scroll
+                <span class="badge b-be">ETL</span> N8N + Python으로 기업마당 API 수집 및 <strong>기사/정책 필터링 완료</strong><br>
+                <span class="badge b-be">DB</span> Supabase 적재 (방대한 데이터 처리 정확도 모니터링 필수)
             </td>
         </tr>
     </table>
@@ -369,8 +294,8 @@
     <div class="tech-note">
         <h4>⚠️ 개발자 코멘트 (Risk & Concern)</h4>
         <ul>
-            <li><strong>Data Volume:</strong> N8N/Python 파이프라인은 구축되었으나, <strong>방대한 데이터의 크롤링 처리 속도 및 분류 정확도</strong>에 대한 현실적인 우려가 있습니다. 초기에는 카테고리를 엄격하게 제한하여 운영하고, 지속적인 필터링 로직 개선이 필요합니다.</li>
-            <li><strong>One-Page Performance:</strong> 모든 섹션이 한 페이지에 있으므로, 이미지(Lottie/SVG) 및 DOM 요소의 최적화가 필수적입니다. (Lazy Loading 적용 권장)</li>
+            <li><strong>Data Concern:</strong> N8N/Python 파이프라인은 구축되었으나, <strong>방대한 데이터 크롤링 속도 및 분류 정확도</strong>에 대한 우려가 있어 지속적인 로직 개선이 필요합니다.</li>
+            <li><strong>SPA Routing:</strong> 상단 탭(GNB)과 우측 스크롤 스파이(Side Nav) 간의 충돌이 없도록, 전역 상태(Zustand) 혹은 라우팅 구조를 명확히 설계해야 합니다.</li>
         </ul>
     </div>
 
