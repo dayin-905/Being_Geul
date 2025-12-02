@@ -142,7 +142,7 @@
     <div class="doc-header">
         <div>
             <h1>Policy Matcher 기능 명세서 <span class="version-badge">v5.0 (Final)</span></h1>
-            <p>SPA 기반 정책 추천 플랫폼 (Team Binggle)</p>
+            <p>One-Page SPA 기반 정책 추천 플랫폼 (Team Binggle)</p>
         </div>
         <div style="text-align: right; font-size: 13px; color: #666;">
             <strong>작성일:</strong> 2025.12.02<br>
@@ -155,6 +155,8 @@
         <div class="arch-step core"><strong>Structure</strong><br>SPA (React)</div>
         <div class="arch-arrow">➕</div>
         <div class="arch-step"><strong>Header</strong><br>3-Tab Nav</div>
+        <div class="arch-arrow">➕</div>
+        <div class="arch-step"><strong>Side Nav</strong><br>Scroll Spy</div>
         <div class="arch-arrow">➡</div>
         <div class="arch-step"><strong>Tab 1</strong><br>Main</div>
         <div class="arch-step"><strong>Tab 2</strong><br>My Page</div>
@@ -163,7 +165,7 @@
 
     <div class="highlight-box">
         <strong>💡 프로젝트 핵심 컨셉 (Core Concept):</strong><br>
-        본 프로젝트는 <strong>"2030 청년 및 초기 창업자"</strong>를 위해 기업마당의 방대한 정책 데이터를 <strong>N8N/Python으로 정제</strong>하고, <strong>3단 탭 구조의 SPA 웹사이트</strong>에서 틴더(Tinder) 스타일 UI로 쉽고 직관적으로 추천해 주는 서비스입니다.
+        본 프로젝트는 <strong>"2030 청년 및 초기 창업자"</strong>를 위해 기업마당의 방대한 정책 데이터를 <strong>N8N/Python으로 정제</strong>하고, <strong>One-Page Scroll 방식의 웹사이트</strong>에서 틴더(Tinder) 스타일 UI로 쉽고 직관적으로 추천해 주는 서비스입니다.
     </div>
 
     <h2><span class="step-num">1</span> 개발 방향성 및 기술 스택 (Tech Stack)</h2>
@@ -198,7 +200,7 @@
         </tr>
     </table>
 
-    <h2><span class="step-num">2</span> 네비게이션 및 레이아웃</h2>
+    <h2><span class="step-num">2</span> 네비게이션 구조 (Navigation)</h2>
     <table>
         <tr>
             <th>구분</th>
@@ -218,14 +220,14 @@
             </td>
         </tr>
         <tr>
-            <td><strong>Web Layout<br>(Mobile Container)</strong></td>
+            <td><strong>Side Nav<br>(Scroll Spy)</strong></td>
             <td>
-                - <strong>Type:</strong> 웹 브라우저 중앙 정렬 컨테이너<br>
-                - <strong>Size:</strong> Max-width 450px
+                - <strong>Type:</strong> 우측 중앙 플로팅<br>
+                - <strong>Func:</strong> 긴 원페이지 내 현재 스크롤 위치 표시
             </td>
             <td>
-                - PC 화면에서도 모바일 앱을 사용하는 듯한 몰입감 제공.<br>
-                - 컨테이너 좌우 여백은 블러(Blur) 처리 배경 적용.
+                - 스크롤 시 자동 활성화 (Intersection Observer).<br>
+                - 클릭 시 부드러운 이동 (ScrollTo).
             </td>
         </tr>
     </table>
@@ -254,17 +256,17 @@
         <tr>
             <td><strong>Card UI</strong></td>
             <td>
-                - <strong>3:4 비율</strong> (컨테이너 내부 채움) + 스크롤 핀(Pin)<br>
-                - <strong>성능 최적화:</strong> 매칭(로딩) 시 Lottie 재생 ↔ 스와이프 시 정적 이미지 전환<br>
+                - <strong>3:4 비율</strong> (모바일 Full) + 스크롤 핀(Pin)<br>
+                - 이미지 매칭 로딩 시 Lottie 애니메이션 (버퍼링 최소화)<br>
                 - <strong>튜토리얼 오버레이:</strong> 최초 진입 시 마우스/키보드 조작법 안내
             </td>
-            <td>GSAP ScrollTrigger<br>React.memo 최적화</td>
+            <td>GSAP ScrollTrigger<br>LocalStorage (Tutorial)</td>
         </tr>
         <tr>
             <td><strong>Action</strong></td>
             <td>
                 - <strong>Left(👈):</strong> Like (저장) / <strong>Right(👉):</strong> Pass (삭제)<br>
-                - <strong>플로팅 버튼:</strong> 우측 하단 [원문 보기] [신청하기] [공유하기]
+                - <strong>플로팅 버튼(New):</strong> 우측 하단 [원문 보기] [신청하기] [공유하기]
             </td>
             <td>Daily Limit: 10 Cards</td>
         </tr>
@@ -272,7 +274,7 @@
             <td><strong>Data Sync</strong></td>
             <td>
                 - 비회원: LocalStorage에 Like 목록 임시 저장<br>
-                - 로그인 시: <strong>Upsert 방식</strong>으로 DB 데이터 이관 (Retry 3회)
+                - 로그인 시: DB로 데이터 이관 (Merge)
             </td>
             <td>Supabase Auth</td>
         </tr>
@@ -317,11 +319,11 @@
                 - <strong>저장 목록:</strong> "좋아요한 정책 보러가기" (가로 슬라이드)<br>
                 - <strong>랜덤 추천:</strong> 하단에 전체 DB 중 랜덤 정책 노출
             </td>
-            <td>Horizontal Scroll<br>ORDER BY RANDOM()</td>
+            <td>Horizontal Scroll</td>
         </tr>
     </table>
 
-    <h2><span class="step-num">5</span> [Tab 3] ABOUT US: 팀 & 문의</h2>
+    <h2><span class="step-num">5</span> [Tab 3] ABOUT US: 팀 소개</h2>
     <p style="font-size: 13px; color: #666;">신규 추가된 홍보 및 문의 페이지입니다.</p>
 
     <table>
@@ -333,7 +335,7 @@
         <tr>
             <td><strong>Brand Film</strong></td>
             <td>
-                - 서비스 홍보 영상 (자동재생 X, 클릭 시 재생)<br>
+                - 서비스 홍보 영상 (클릭 시 재생)<br>
                 - 재생바, 음량 조절 컨트롤러 포함
             </td>
             <td><code>&lt;video controls&gt;</code></td>
@@ -350,18 +352,18 @@
             <td><strong>Contact Us</strong></td>
             <td>
                 - 상세 문의 폼 (이름, 이메일, 연락처, 내용)<br>
-                - <strong>보안:</strong> <span class="badge b-fe">Login Only</span> 로그인한 사용자만 작성 가능
+                - "문의하기" 버튼 클릭 시 접수 완료 모달
             </td>
-            <td>Supabase Table<br>(contact_messages)</td>
+            <td>Form Validation<br>DB Insert</td>
         </tr>
     </table>
 
     <div class="tech-note">
         <h4>✅ 최종 검토 사항 (Final Review Note)</h4>
         <ul>
-            <li><strong>Structure:</strong> 복잡한 스크롤 스파이를 제거하고 3단 탭 SPA 구조로 단순화하여 개발 리스크를 최소화했습니다.</li>
-            <li><strong>Web UX:</strong> PC 환경을 고려하여 '모바일 컨테이너' 레이아웃을 채택, 3:4 비율 카드 UI가 깨지는 것을 방지했습니다.</li>
-            <li><strong>Performance:</strong> Lottie 애니메이션과 스와이프 인터랙션의 동시 실행을 방지하는 로직을 추가하여 모바일 최적화를 달성합니다.</li>
+            <li><strong>SPA Architecture:</strong> 모든 탭과 섹션은 하나의 페이지 내에서 유기적으로 연결되며, 새로고침 없이 부드럽게 전환되어야 합니다.</li>
+            <li><strong>Data Stability:</strong> 방대한 기업마당 데이터를 N8N으로 1차 정제했으나, 실시간 서비스 시 API 호출량 및 로딩 속도 최적화(Lazy Loading)가 필수적입니다.</li>
+            <li><strong>Schedule:</strong> 디자인 시스템 확정(12/8) 즉시 퍼블리싱 및 기능 구현에 착수하여 1월 16일 런칭 일정을 준수합니다.</li>
         </ul>
     </div>
 
