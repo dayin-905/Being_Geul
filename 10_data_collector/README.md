@@ -32,11 +32,11 @@
 
 ```mermaid
 graph TB
-    Client[Client (React/Vite)]
-    Supabase[Supabase (DB/Auth/API)]
-    AutoServer[Automation Engine (N8N/Python)]
-    ExtAPI[External API (Bizinfo)]
-    AI[AI Service (OpenAI)]
+    Client["Client (React/Vite)"]
+    Supabase["Supabase (DB/Auth/API)"]
+    AutoServer["Automation Engine (N8N/Python)"]
+    ExtAPI["External API (Bizinfo)"]
+    AI["AI Service (OpenAI)"]
     
     %% Connections
     Client --> Supabase
@@ -50,9 +50,10 @@ graph TB
     style AutoServer fill:#e1ffe1,stroke:#1b5e20
     style ExtAPI fill:#fff9c4,stroke:#fbc02d
     style AI fill:#f3e5f5,stroke:#4a148c
+```
 
-    ## 🔄 Service Workflow
-
+## 🔄 Service Workflow
+```mermaid
 graph TD
     %% Style Definitions
     classDef actor fill:#f9f,stroke:#333,stroke-width:2px,color:black;
@@ -64,20 +65,20 @@ graph TD
 
     %% 1. Data Pipeline & Backend
     subgraph "Phase 1 & 2: Data Automation & Backend"
-        API[🏢 기업마당(Bizinfo) API<br/>Startup Support Data]:::data
-        Scraping[🕷️ Data Collection<br/>Python & N8N]:::data
+        API["🏢 기업마당(Bizinfo) API<br/>Startup Support Data"]:::data
+        Scraping["🕷️ Data Collection<br/>Python & N8N"]:::data
         
         API --> Scraping
         
         subgraph "AI Processing"
-            Prompt[📝 System Prompt<br/>'Summary + Extract Amount']:::ai
-            GPT[🤖 OpenAI GPT-4o-mini<br/>Processing & Tagging]:::ai
+            Prompt["📝 System Prompt<br/>'Summary + Extract Amount'"]:::ai
+            GPT["🤖 OpenAI GPT-4o-mini<br/>Processing & Tagging"]:::ai
             Prompt --> GPT
         end
         
         Scraping --> GPT
         
-        DB[(🗄️ Supabase DB<br/>Policies / Users / Likes)]:::db
+        DB[("🗄️ Supabase DB<br/>Policies / Users / Likes")]:::db
         GPT -- "Insert Processed JSON" --> DB
     end
 
@@ -86,9 +87,9 @@ graph TD
         User((👤 User)):::actor
         
         subgraph "Page 1: Discovery (Main)"
-            Intro[🎬 Intro / Loading<br/>GSAP Animation]:::fe
-            Filter[⚙️ Onboarding Filter<br/>Period/Region/Category]:::fe
-            Deck[🃏 Card Deck<br/>Tinder Style UI]:::fe
+            Intro["🎬 Intro / Loading<br/>GSAP Animation"]:::fe
+            Filter["⚙️ Onboarding Filter<br/>Period/Region/Category"]:::fe
+            Deck["🃏 Card Deck<br/>Tinder Style UI"]:::fe
             
             Intro --> Filter
             Filter -- "Request Filtered Data" --> DB
@@ -96,16 +97,16 @@ graph TD
         end
         
         subgraph "Interaction Logic"
-            SwipeL[👈 Swipe LEFT<br/>PASS (Skip)]:::action
-            SwipeR[👉 Swipe RIGHT<br/>SAVE (Like)]:::action
+            SwipeL["👈 Swipe LEFT<br/>PASS (Skip)"]:::action
+            SwipeR["👉 Swipe RIGHT<br/>SAVE (Like)"]:::action
             
             Deck --> SwipeL
             Deck --> SwipeR
         end
         
         subgraph "Page 2: Archiving (Personal)"
-            MyWallet[📂 My Wallet<br/>Masonry Layout]:::fe
-            Chart[📊 Analysis Chart<br/>Hexagon Radar / Gauge]:::fe
+            MyWallet["📂 My Wallet<br/>Masonry Layout"]:::fe
+            Chart["📊 Analysis Chart<br/>Hexagon Radar / Gauge"]:::fe
             
             SwipeR -- "Update DB (Saved)" --> DB
             DB -- "Sync State (Zustand)" --> MyWallet
@@ -119,12 +120,13 @@ graph TD
     SwipeR --> |"Load Next Card"| Deck
     
     %% Details
-    Detail[📄 Detail Modal<br/>Link to Original Source]:::fe
+    Detail["📄 Detail Modal<br/>Link to Original Source"]:::fe
     Deck -- "Click/Tap" --> Detail
     MyWallet -- "Click/Tap" --> Detail
+```
 
 ## 💾 Database Schema
-
+```mermaid
 erDiagram
     USERS ||--o{ USER_POLICIES : "saves (likes)"
     POLICIES ||--o{ USER_POLICIES : "is_saved_by"
@@ -156,8 +158,9 @@ erDiagram
         boolean is_liked "True if Swiped Right"
         timestamp created_at
     }
+```
 
-##🛠️ Tech Stack
+## 🛠️ Tech Stack
 ### Frontend
 ### Backend & Data
 ### AI & Tools
