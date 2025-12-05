@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Walking Friends Animation</title>
+<style>
+    /* 전체 레이아웃 */
+    body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f4f8;
+    }
+    
+    svg {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* === 애니메이션 정의 === */
+
+    /* 1. 걷는 모션 (통통 튀는 느낌) */
+    @keyframes walkBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    /* 2. 다리 움직임 (간소화) */
+    @keyframes legWalk {
+        0%, 100% { transform: rotate(-10deg); }
+        50% { transform: rotate(10deg); }
+    }
+    @keyframes legWalkReverse {
+        0%, 100% { transform: rotate(10deg); }
+        50% { transform: rotate(-10deg); }
+    }
+
+    /* 3. 왼쪽 여성: 머리카락 흩날림 */
+    @keyframes hairWind {
+        0%, 100% { transform: skewX(0deg) scaleX(1); }
+        50% { transform: skewX(-5deg) scaleX(1.05); }
+    }
+
+    /* 4. 가운데 남성: 노트북 사용 (0~1초 보임, 이후 사라짐) */
+    /* 전체 사이클을 5초로 가정했을 때, 1초는 20% */
+    @keyframes laptopAction {
+        0% { opacity: 1; transform: translateY(0); }
+        15% { opacity: 1; transform: translateY(0); }
+        20% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 0; transform: translateY(20px); }
+    }
+    /* 노트북 닫은 후 팔 동작 */
+    @keyframes armRest {
+        0% { transform: rotate(-20deg); } /* 노트북 칠 때 */
+        15% { transform: rotate(-20deg); }
+        20% { transform: rotate(0deg); } /* 내림 */
+        100% { transform: rotate(0deg); }
+    }
+
+    /* 5. 오른쪽 남성: 뒤로 걷다가 앞으로 돌기 */
+    /* 5초 사이클 중 2초(40%)는 뒤로(반전), 이후 앞으로 */
+    @keyframes turnAround {
+        0% { transform: scaleX(-1) translateX(-50px); } /* 뒤를 봄 (좌우반전) */
+        35% { transform: scaleX(-1) translateX(-50px); }
+        40% { transform: scaleX(1) translateX(0); } /* 앞을 봄 */
+        100% { transform: scaleX(1) translateX(0); }
+    }
+
+    /* 6. 배경: 구름 둥실둥실 */
+    @keyframes cloudFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* 7. 배경: 전구 (구름과 반대 방향) */
+    @keyframes bulbFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(10px); } /* 구름과 반대 */
+    }
+
+    /* 8. 배경: 건물 스톱모션 (뚝뚝 끊기게) */
+    @keyframes stopMotionBuild {
+        0% { transform: skewX(0); }
+        25% { transform: skewX(1deg); }
+        50% { transform: skewX(0); }
+        75% { transform: skewX(-1deg); }
+        100% { transform: skewX(0); }
+    }
+
+    /* === 요소별 적용 === */
+    .char-group { animation: walkBounce 0.6s infinite ease-in-out; }
+    .leg-l { animation: legWalk 0.6s infinite linear; transform-origin: top center; }
+    .leg-r { animation: legWalkReverse 0.6s infinite linear; transform-origin: top center; }
+    
+    .woman-hair { animation: hairWind 1.5s infinite ease-in-out; transform-origin: top left; }
+    
+    /* 가운데 남자: 노트북 루프는 5초 단위로 설정 */
+    .man-middle-laptop { animation: laptopAction 5s infinite; }
+    .man-middle-arm { animation: armRest 5s infinite; transform-origin: top left; }
+
+    /* 오른쪽 남자: 턴 루프 5초 단위 */
+    .man-right-body { animation: turnAround 5s infinite steps(1); transform-origin: center; }
+
+    .cloud { animation: cloudFloat 3s infinite ease-in-out; }
+    .bulb { animation: bulbFloat 3s infinite ease-in-out; }
+    .building { animation: stopMotionBuild 0.5s infinite steps(3); transform-origin: bottom center; }
+
+</style>
+</head>
+<body>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+    <g id="background">
+        <line x1="50" y1="450" x2="750" y2="450" stroke="black" stroke-width="3" />
+        
+        <g class="building" opacity="0.3">
+            <rect x="250" y="200" width="60" height="250" fill="none" stroke="black" stroke-width="2"/>
+            <rect x="260" y="220" width="40" height="200" rx="5" fill="none" stroke="black" stroke-width="1"/>
+        </g>
+        <g class="building" opacity="0.3" style="animation-delay: 0.1s;">
+            <rect x="500" y="250" width="50" height="200" fill="none" stroke="black" stroke-width="2"/>
+            <rect x="510" y="270" width="10" height="10" fill="none" stroke="black"/>
+            <rect x="530" y="270" width="10" height="10" fill="none" stroke="black"/>
+        </g>
+
+        <path class="cloud" d="M100,100 Q120,80 140,100 T180,100 T220,100" fill="none" stroke="black" stroke-width="3" stroke-linecap="round"/>
+        <path class="cloud" d="M600,120 Q620,100 640,120 T680,120" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" style="animation-delay: 1s;"/>
+
+        <g class="bulb" transform="translate(500, 100)">
+            <path d="M0,0 A20,20 0 1,1 20,20 L15,35 L5,35 L0,20 Z" fill="white" stroke="black" stroke-width="2" transform="translate(-10, -30)"/>
+            <path d="M-10,-40 L-15,-50 M10,-40 L15,-50 M0,-50 L0,-60" stroke="black" stroke-width="2"/> </g>
+    </g>
+
+    <g transform="translate(150, 250)">
+        <line class="leg-l" x1="0" y1="130" x2="-20" y2="200" stroke="black" stroke-width="18" stroke-linecap="round"/>
+        <line class="leg-r" x1="20" y1="130" x2="40" y2="200" stroke="black" stroke-width="18" stroke-linecap="round"/>
+        
+        <g class="char-group">
+            <path class="woman-hair" d="M-20,-40 Q-50,-20 -60,50 Q-50,80 -20,60" fill="#222"/>
+            <path d="M-25,40 Q-30,130 0,130 Q30,130 25,40" fill="#469C95" stroke="black" stroke-width="2"/>
+            <circle cx="0" cy="0" r="35" fill="white" stroke="black" stroke-width="2"/>
+            <path d="M-10,5 Q0,15 10,5" fill="none" stroke="black" stroke-width="2"/>
+            <circle cx="-10" cy="-5" r="2" fill="black"/>
+            <circle cx="10" cy="-5" r="2" fill="black"/>
+            <rect x="-15" y="50" width="30" height="40" fill="white" stroke="black" stroke-width="2"/>
+            <path d="M-5,65 Q0,75 5,65" fill="red" opacity="0.8"/> </g>
+    </g>
+
+    <g transform="translate(400, 240)">
+        <line class="leg-l" x1="-10" y1="130" x2="-25" y2="210" stroke="black" stroke-width="18" stroke-linecap="round"/>
+        <line class="leg-r" x1="10" y1="130" x2="25" y2="210" stroke="black" stroke-width="18" stroke-linecap="round"/>
+
+        <g class="char-group">
+            <rect x="-35" y="30" width="70" height="100" rx="10" fill="#E88C52" stroke="black" stroke-width="2"/>
+            <circle cx="0" cy="0" r="35" fill="white" stroke="black" stroke-width="2"/>
+            <circle cx="-10" cy="-5" r="2" fill="black"/>
+            <circle cx="10" cy="-5" r="2" fill="black"/>
+            <path d="M-5,10 Q0,15 5,10" fill="none" stroke="black" stroke-width="2"/>
+            <path d="M-35,-10 Q-10,-40 35,-10" fill="black"/>
+
+            <g class="man-middle-arm">
+                <line x1="-10" y1="50" x2="20" y2="70" stroke="#E88C52" stroke-width="15" stroke-linecap="round"/>
+                <g class="man-middle-laptop">
+                    <rect x="10" y="40" width="50" height="40" fill="white" stroke="black" stroke-width="2"/>
+                    <path d="M25,55 L35,65 L30,55" fill="none" stroke="black" width="1"/> </g>
+            </g>
+        </g>
+    </g>
+
+    <g transform="translate(650, 250)">
+        <g class="man-right-body">
+            <line class="leg-l" x1="-10" y1="130" x2="-30" y2="200" stroke="black" stroke-width="18" stroke-linecap="round"/>
+            <line class="leg-r" x1="10" y1="130" x2="30" y2="200" stroke="black" stroke-width="18" stroke-linecap="round"/>
+
+            <g class="char-group">
+                <rect x="-35" y="30" width="70" height="100" rx="5" fill="#D9B756" stroke="black" stroke-width="2"/>
+                <line x1="-10" y1="30" x2="-10" y2="130" stroke="black" stroke-width="1"/>
+                <line x1="10" y1="30" x2="10" y2="130" stroke="black" stroke-width="1"/>
+                
+                <circle cx="0" cy="0" r="35" fill="white" stroke="black" stroke-width="2"/>
+                <circle cx="-10" cy="-5" r="2" fill="black"/>
+                <circle cx="10" cy="-5" r="2" fill="black"/>
+                <path d="M-10,10 Q0,20 10,10" fill="none" stroke="black" stroke-width="2"/>
+
+                <path d="M-35,-5 A35,35 0 0,1 35,-5 L45,-5 L-35,-5 Z" fill="#333"/>
+                
+                <path d="M-40,20 Q-40,50 -20,50" fill="none" stroke="#333" stroke-width="5"/>
+                <path d="M40,20 Q40,50 20,50" fill="none" stroke="#333" stroke-width="5"/>
+            </g>
+        </g>
+    </g>
+
+</svg>
+
+</body>
+</html>

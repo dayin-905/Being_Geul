@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>News Tinder Prototype</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ★★★ 중요: 여기서 세로 정렬로 바꿔줍니다 ★★★ */
+        body {
+            /* 기존 style.css의 flex 설정을 유지하면서 방향만 세로로 변경 */
+            flex-direction: column; 
+            /* 카드 사이의 간격 */
+            gap: 30px; 
+        }
+
+        /* 뉴스 카드 스타일 */
+        .news-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: sans-serif;
+            background-color: white; /* 배경색 추가 (겹칠 때를 대비) */
+        }
+        
+        /* 로딩 카드 스타일 (뉴스 카드와 비슷하게 꾸밈) */
+        .loading-card {
+            text-align: center;
+            font-family: sans-serif;
+            color: #555;
+        }
+
+        /* 버튼 스타일 */
+        .like-button {
+            background: none;
+            border: 2px solid #e91e63;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+            margin: 0 auto; /* 버튼 가운데 정렬 */
+            margin-top: 15px;
+        }
+
+        .like-button:hover {
+            background-color: #fce4ec;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="card loading-card">
+        <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle class="spinner" cx="50" cy="50" r="40" fill="none" stroke-width="8" stroke-dasharray="180 260"
+                stroke-linecap="round" />
+        </svg>
+        <p>다음 뉴스 불러오는 중...</p>
+    </div>
+
+    <div class="news-card">
+        <h3>오늘의 경제 뉴스</h3>
+        <p>스타트업 시장이 활성화되면서...</p>
+
+        <button class="like-button">
+            <svg width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <style>
+                    .heartbeat {
+                        transform-origin: center;
+                        animation: pulse 1.2s infinite;
+                        fill: #e91e63;
+                    }
+
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.2); }
+                        100% { transform: scale(1); }
+                    }
+                </style>
+                <path class="heartbeat"
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+        </button>
+    </div>
+
+</body>
+</html>
