@@ -1,0 +1,374 @@
+{
+  "name": "빙글용 DB수집",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -512
+      ],
+      "id": "5bb9d54e-3ebb-4abd-92aa-01134a1b2dfd",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "TRUNCATE TABlE being_geul;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        64,
+        -784
+      ],
+      "id": "be706821-8663-4f79-92c5-06ad11a53235",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "yuDvm8v81B8GNPNT",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO being_geul (title, summary, period, link, genre)\nVALUES ($1, $2, $3, $4, $5)\n\n",
+        "options": {
+          "queryReplacement": "={{ [\n  $('organize').item.json.title, \n  $('organize').item.json.summary, \n  $('Merge').item.json.period, \n  $('Merge').item.json.link, \n  $json.content.parts[0].text \n] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1408,
+        -432
+      ],
+      "id": "41848cb7-d704-40dc-9dfd-46210d02c632",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "yuDvm8v81B8GNPNT",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.text }}\n\n아래 내용을 바탕으로 청년층의 관심을 끌 수 있는 '제목'과 '요약'을 작성해줘.\n반드시 아래 JSON 형식을 지켜서 출력해야 해. 설명이나 다른 말은 절대 하지 마.\n\n[내용]\n{{ $json.text }}\n\n[제약 조건]\n1. 제목 (title):\n - 청년들이 클릭하고 싶게 자극적이고 트렌디하게 (어그로성)\n - 쉼표(,) 절대 사용 금지\n - 공백 포함 20자 이내 (두 줄 분량)\n2. 요약 (summary):\n - 핵심 내용만 간결하게\n - 쉼표(,) 절대 사용 금지\n - 공백 포함 50자 이내 (세 줄 분량)\n\n[출력 포맷]\n{\n  \"title\": \"여기에 제목 작성\",\n  \"summary\": \"여기에 요약 내용 작성\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        -768
+      ],
+      "id": "27477126-d4ab-4726-89ed-320b52eee4a1",
+      "name": "summary",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "nOTX1fmCIU1cbyNM",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=너는 대한민국 정책 데이터를 분류하는 AI야. 아래 [내용]을 읽고, [목록] 중에서 가장 적절한 카테고리를 딱 하나만 골라서 단어로만 답해줘. 부가 설명이나 문장 부호는 절대 넣지 마.\n\n[목록]\n- 금융/자산\n- 취업/창업\n- 주거/생활\n- 교육/역량\n- 복지/건강\n- 참여/권리\n\n[내용]\n{{ $('Merge').item.json.text || '내용 없음' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        -736
+      ],
+      "id": "5c2a9f7a-3901-4a78-8c8d-eba3862d2b10",
+      "name": "genre",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "nOTX1fmCIU1cbyNM",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. 데이터 리스트 꺼내기\n// (n8n 버전에 따라 items[0].json 혹은 $input.item.json 등이 될 수 있으나, 기존 코드 유지)\nconst rootData = items[0].json;\nconst policyList = (rootData.result && rootData.result.youthPolicyList) ? rootData.result.youthPolicyList : [];\n\nconst results = [];\n\nfor (const policy of policyList) {\n  \n  // 제목, 내용\n  const title = policy.plcyNm || \"제목 없음\";        \n  const text = policy.plcySprtCn || \"\";     \n\n  // -------------------------------------------------------\n  // [보완 1] 기간 채우기 전략 (3단계 방어)\n  // -------------------------------------------------------\n  let periodStr = \"\";\n\n  // 1순위: 신청 기간 문자열 (reqstBeginEndDe)\n  if (policy.reqstBeginEndDe) {\n    periodStr = policy.reqstBeginEndDe;\n  } \n  // 2순위: 신청 기간 날짜 (aplyBgngYmd)\n  else if (policy.aplyBgngYmd && policy.aplyEndYmd) {\n    const start = policy.aplyBgngYmd.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');\n    const end = policy.aplyEndYmd.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');\n    periodStr = `${start} ~ ${end}`;\n  } \n  // 3순위: 다 없으면 '사업 운영 기간'이라도 보여주기\n  else if (policy.bizPrdBgngYmd && policy.bizPrdEndYmd) {\n    const start = policy.bizPrdBgngYmd.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');\n    const end = policy.bizPrdEndYmd.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');\n    periodStr = `(운영기간) ${start} ~ ${end}`;\n  }\n  // 4순위: 진짜 아무것도 없음\n  else {\n    periodStr = \"상세 내용 참조\";\n  }\n\n  // -------------------------------------------------------\n  // [보완 2] 링크 채우기 전략 (요청하신 순서 적용)\n  // -------------------------------------------------------\n  let finalLink = \"\";\n  \n  // [요청 1순위] refUrlAddr2 (참조 URL 2)\n  if (policy.refUrlAddr2) {\n    finalLink = policy.refUrlAddr2;\n  }\n  // [요청 2순위] refUrlAddr1 (참조 URL 1)\n  else if (policy.refUrlAddr1) {\n    finalLink = policy.refUrlAddr1;\n  }\n  // 3순위: 직접 신청 주소 (aplyUrlAddr)\n  else if (policy.aplyUrlAddr) {\n    finalLink = policy.aplyUrlAddr;\n  }\n  // 4순위: 기타 URL (etctUrl)\n  else if (policy.etctUrl) {\n    finalLink = policy.etctUrl;\n  }\n  // 5순위: 다 없으면 '온통청년' 상세 페이지 (bizId 이용)\n  // 반복문 안이므로 item.json.bizId가 아니라 policy.bizId를 써야 정확합니다.\n  else {\n     // bizId가 있으면 ID 기반 링크 생성\n     if (policy.bizId) {\n        finalLink = `https://www.youthcenter.go.kr/youngPlcyUnif/youngPlcyUnifDtl.do?bizId=${policy.bizId}`;\n     } \n     // bizId조차 없으면 네이버 검색 (최후의 수단)\n     else {\n        finalLink = `https://search.naver.com/search.naver?query=${encodeURIComponent(title)}`;\n     }\n  }\n\n  results.push({\n    json: {\n      title: title,\n      text: text,\n      period: periodStr,\n      link: finalLink\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        -560
+      ],
+      "id": "d69aecd6-1ad4-49ed-aa7c-f51cef48a681",
+      "name": "Code in JavaScript2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// CASE 2: 데이터 위치 설정\nconst rawDataList = items[0].json.jsonArray;\n\nif (!rawDataList || !Array.isArray(rawDataList)) return [];\n\n// 1. 필터링 (기존 로직 유지)\nconst keywords = ['창업']; \nconst filteredResults = rawDataList.filter(item => {\n  const allText = JSON.stringify(item);\n  return keywords.every(key => allText.includes(key));\n});\n\n// 2. 데이터 매핑 (원하는 컬럼명으로 변환) - 여기가 핵심!\n// API 응답 키값(supportBizNm 등)을 우리 DB 컬럼명(title 등)으로 매칭합니다.\nconst mappedResults = filteredResults.map(item => {\n    return {\n        json: {\n            title: item.pblancNm,       // 공고 제목\n            text: item.bsnsSumryCn,\n            period: item.reqstBeginEndDe,   // 신청 기간 (키값 확인 필요)\n            // 링크는 보통 pblancId 등을 조합하거나 url 필드가 따로 있음. \n            // API 응답에 'pblancUrl' 같은게 없다면 아래처럼 ID로 조합해야 할 수도 있습니다.\n// link 부분만 이렇게 바꿔보세요\nlink: item.pblancUrl \n    ? (item.pblancUrl.startsWith('http') ? item.pblancUrl : `https://www.bizinfo.go.kr${item.pblancUrl}`)\n    : `https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/A/${item.pblancId}/view.do`\n        }\n    }\n});\n\nreturn mappedResults;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -896
+      ],
+      "id": "f2b2bc4f-0b5f-4435-b936-f5a28a07d4ea",
+      "name": "filter",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item, index) => {\n  try {\n    // 1. [수정] summary 노드도 197개가 있으니, 내 순번(index)에 맞는 걸 가져옵니다.\n    const summaryNodeItems = $('summary').all();\n    \n    // 짝이 안 맞을 경우 에러 처리\n    if (!summaryNodeItems[index]) {\n      throw new Error(`Summary 결과가 모자랍니다. (현재 순번: ${index})`);\n    }\n\n    const targetItem = summaryNodeItems[index];\n\n    // 2. 텍스트 추출 (스크린샷에 보이는 경로: content.parts[0].text)\n    // 안전하게 가져오기 위해 경로가 없으면 빈 문자열 처리\n    let rawText = \"\";\n    if (targetItem.json.content && targetItem.json.content.parts && targetItem.json.content.parts[0]) {\n      rawText = targetItem.json.content.parts[0].text;\n    } else {\n      // 혹시 경로가 다를 경우를 대비해 최상위 text도 확인\n      rawText = targetItem.json.text || \"\";\n    }\n\n    // 3. Markdown 코드 블록(```json ... ```) 제거 및 파싱\n    // 문자열에서 첫 번째 '{'와 마지막 '}' 사이만 발라냅니다.\n    const firstBrace = rawText.indexOf('{');\n    const lastBrace = rawText.lastIndexOf('}');\n\n    if (firstBrace !== -1 && lastBrace !== -1) {\n      const jsonOnly = rawText.substring(firstBrace, lastBrace + 1);\n      const parsedData = JSON.parse(jsonOnly);\n\n      // 4. 결과 저장\n      item.json.title = parsedData.title || parsedData.Title || \"제목 없음\";\n      item.json.summary = parsedData.summary || parsedData.Summary || parsedData.description || \"요약 없음\";\n    } else {\n      throw new Error(\"JSON 형식({ ... })을 찾을 수 없습니다.\");\n    }\n\n  } catch (error) {\n    // 에러가 나면 원인을 출력하고, 원본 텍스트도 같이 보여줌 (디버깅용)\n    item.json.error = error.message;\n    // item.json.debug_raw = rawText; // 필요시 주석 해제\n  }\n\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        -752
+      ],
+      "id": "3b5f50cb-f957-4930-bc82-eb2539f2747e",
+      "name": "organize"
+    },
+    {
+      "parameters": {
+        "url": "https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do?crtfcKey=2R12Bu&dataType=json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "crtfckey",
+              "value": "2R12Bu"
+            },
+            {
+              "name": "dataType",
+              "value": "json"
+            },
+            {
+              "name": "searchKeyword"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        -928
+      ],
+      "id": "ae64895e-a091-4d80-81ff-9a9b0f65a1cd",
+      "name": "기업마당"
+    },
+    {
+      "parameters": {
+        "url": "https://www.youthcenter.go.kr/go/ythip/getPlcy",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "apiKeyNm",
+              "value": "099158f1-c67e-4253-b608-3f467b8af06d"
+            },
+            {
+              "name": "display",
+              "value": "450"
+            },
+            {
+              "name": "pageNum",
+              "value": "1"
+            },
+            {
+              "name": "pageType",
+              "value": "2"
+            },
+            {
+              "name": "pageSize",
+              "value": "450"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        -560
+      ],
+      "id": "eeccd786-d335-43b1-93e9-0ae512ec0d5c",
+      "name": "온통 청년"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        896,
+        -752
+      ],
+      "id": "ba2be7ac-11f3-4de5-9171-d633f08a9f6a",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "온통 청년",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "기업마당",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summary": {
+      "main": [
+        [
+          {
+            "node": "organize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "genre": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "organize": {
+      "main": [
+        [
+          {
+            "node": "genre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "기업마당": {
+      "main": [
+        [
+          {
+            "node": "filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "온통 청년": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "961a4e4c-9d2c-4384-8e38-ad381eff453e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eec87c2ec32eca3b59186241eaf6090f05234b97eb659cbffd686c72a5557989"
+  },
+  "id": "JVeF4CgkahslnaWX",
+  "tags": []
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>반응형 레이아웃 테스트</title>
+    <style>
+        /* 1. 기본 스타일 (공통) */
+        body { margin: 0; padding: 20px; font-family: sans-serif; }
+        
+        .container {
+            display: flex;       /* 플렉스박스 선언 (자식들을 유연하게 배치하겠다) */
+            flex-wrap: wrap;     /* 공간이 부족하면 줄바꿈을 허용하겠다 (핵심) */
+            gap: 20px;           /* 박스 사이 간격 */
+        }
+
+        .card {
+            background-color: #4338CA; /* 인디고 색상 */
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            font-size: 20px;
+            text-align: center;
+            
+            /* 2. PC 화면 기준 (가로폭이 넓을 때) */
+            /* 100%에서 3개를 나누고 간격을 뺌 -> 가로로 3개 배치 */
+            width: calc(33.333% - 20px); 
+            transition: all 0.5s; /* 부드럽게 움직이는 애니메이션 */
+        }
+
+        /* 3. 모바일/태블릿 화면 기준 (가로폭이 768px 이하로 줄어들면) */
+        @media (max-width: 768px) {
+            .card {
+                /* 가로폭을 100%로 늘려서 꽉 채움 -> 자연스럽게 세로로 쌓임 */
+                width: 100%; 
+                background-color: #EC4899; /* 핑크색으로 변경 (반응형 확인용) */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>창 크기를 줄였다 늘렸다 해보세요!</h2>
+    
+    <div class="container">
+        <div class="card">1. 정책 카드 A</div>
+        <div class="card">2. 정책 카드 B</div>
+        <div class="card">3. 정책 카드 C</div>
+    </div>
+
+</body>
+</html>
