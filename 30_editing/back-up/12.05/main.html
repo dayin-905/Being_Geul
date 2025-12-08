@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 모바일 터치 최적화 -->
+    <title>청년 정책 플랫폼</title>
+
+    <!-- 파비콘 & CSS -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 폰트 (Pretendard) -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <!-- 아이콘 (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#F48245',
+                        'primary-teal': '#4A9EA8',
+                        'primary-beige': '#D9B36C',
+                        'primary-red': '#FF5A5F',
+                        'bg-light': '#FFFFFF',
+                        'text-main': '#000000',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    ```
+</head>
+
+<body>
+
+    <!-- 1. Navigation -->
+    <nav class="navigation">
+        <div class="nav-inner">
+            <!-- 로고 영역 -->
+            <a href="main.html" class="logo-area">
+                <img src="https://placehold.co/100x40/transparent/333?text=LOGO" alt="Logo" class="logo-img">
+            </a>
+
+            <!-- 메뉴 영역: 3색 알약 버튼 -->
+            <ul class="nav-pills">
+                <li class="nav-item home"><a href="main.html">Home</a></li>
+                <li class="nav-item mypage"><a href="mypage.html">My Page</a></li>
+                <li class="nav-item about"><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="body-container">
+
+        <!-- 2. Header Section -->
+        <section class="header-section">
+            <div class="header-content-wrapper">
+                <div class="header-text">
+                    <h1>쑥쑥 훑어보는<br>청년 정책 소식 📰</h1>
+                    <p>나에게 딱 맞는 정책을 쉽고 빠르게 찾아보세요.<br>매일 업데이트되는 새로운 소식을 놓치지 마세요!</p>
+                </div>
+                <div class="header-image">
+                    <img src="assets/header_image.png"
+                        onerror="this.src='https://placehold.co/500x400?text=Header+Image'" alt="Main Illustration">
+                </div>
+            </div>
+
+            <div class="dvline">
+                <span class="dv-item">Static Bloom</span>
+                <span class="dv-item pink-bullet">2023</span>
+                <span class="dv-item pink-bullet">Hazy, melancholic</span>
+                <span class="dv-item pink-bullet long-text">For the light leaks and long silences</span>
+            </div>
+        </section>
+
+        <!-- 3. Tinder Section (Swipe Cards) -->
+        <section class="tinder-section">
+            <div class="section-title">
+                <h2>지금 주목해야 할 정책 🔥</h2>
+                <p>카드를 좌우로 넘겨보세요 (스와이프)</p>
+            </div>
+            <div class="swiper-container">
+                <div class="card-stack" id="tinder-list">
+                    <div class="no-more-cards">모든 카드를 확인했습니다! 🎉</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Search Section -->
+        <section class="search-section">
+            <h2>관심있는 정책 키워드는<br>직접 찾아보세요!</h2>
+            <p>원하는 키워드로 정책을 검색해보세요.</p>
+            <div class="search-bar-container">
+                <div class="icon-area">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="키워드를 입력해보세요 (예: 취업, 주거)">
+                <button id="search-btn">SEARCH</button>
+            </div>
+        </section>
+
+        <!-- 5. Slide Section (Infinite Marquee) -->
+        <section class="slide-section">
+            <div class="section-header">
+                <h3 id="result-message">추천 정책 (30건)</h3>
+            </div>
+            <div class="marquee-wrapper">
+                <div class="marquee-row scroll-left" id="slide-row-1"></div>
+                <div class="marquee-row scroll-right" id="slide-row-2"></div>
+            </div>
+        </section>
+
+        <!-- 6. Membership Section (Updated Image Path) -->
+        <section class="membership-section">
+            <div class="membership-content">
+                <h2>나에게<br>정말 필요한 정책만<br>차곡차곡 쌓아 봐요!</h2>
+
+                <div class="membership-btns">
+                    <button id="btn-signup" class="btn-primary-red">회원가입</button>
+                    <button id="btn-share" class="btn-secondary-white">공유하기</button>
+                </div>
+
+                <div class="membership-img">
+                    <!-- 요청하신 이미지 경로 적용 -->
+                    <img src="assets/membership_image.png"
+                        onerror="this.src='https://placehold.co/400x300/transparent/orange?text=Login+Illustration'"
+                        alt="Membership Illustration">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 7. Marquee (Footer Text) -->
+    <div class="marquee-area">
+        <div class="track">
+            <span>서울시 청년 정책 모음 🚀 취업부터 주거까지 한눈에 확인하세요! &nbsp;&nbsp;&nbsp; 서울시 청년 정책 모음 🚀 취업부터 주거까지 한눈에 확인하세요!
+                &nbsp;&nbsp;&nbsp; </span>
+        </div>
+    </div>
+
+
+    <!-- =========================
+         MODALS (팝업창 모음)
+    ========================= -->
+
+    <!-- 1. 정책 상세 보기 모달 -->
+    <div id="policy-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-image">
+                <img id="modal-img" src="" alt="Policy Image">
+                <span id="modal-category" class="modal-tag">카테고리</span>
+            </div>
+            <div class="modal-body">
+                <h2 id="modal-title">정책 제목</h2>
+                <p id="modal-desc">정책 상세 내용</p>
+                <p id="modal-date" class="date">마감일</p>
+
+                <div class="modal-actions">
+                    <button id="modal-close-btn" class="action-btn back-btn">
+                        <i class="fa-solid fa-arrow-left"></i> 되돌아가기
+                    </button>
+                    <button id="modal-heart-btn" class="action-btn heart-btn">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 회원가입 모달 -->
+    <div id="signup-modal" class="modal-overlay hidden">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h3>회원가입</h3>
+                <button class="close-icon-btn" onclick="closeSignupModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body form-body">
+                <p class="form-desc">간편하게 가입하고 맞춤 정책을 추천받으세요!</p>
+                <input type="text" placeholder="아이디" class="modal-input">
+                <input type="password" placeholder="비밀번호" class="modal-input">
+                <input type="text" placeholder="이름" class="modal-input">
+                <button class="btn-primary-red full-width">가입하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 공유하기 모달 -->
+    <div id="share-modal" class="modal-overlay hidden">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h3>공유하기</h3>
+                <button class="close-icon-btn" onclick="closeShareModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body form-body">
+                <p class="form-desc">아래 링크를 복사해서 친구들에게 공유해보세요.</p>
+                <div class="url-box">
+                    <input type="text" id="share-url-input" readonly>
+                    <button onclick="copyUrl()" class="copy-btn">복사</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+
+</html>
